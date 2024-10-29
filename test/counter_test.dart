@@ -12,21 +12,23 @@ void main() {
   });
 
   test('Inicializa o contador com 0 se não houver valor salvo', () async {
-    counterService = CounterService(); // Chama o método de inicialização
+    // Chama o método de inicialização
+    counterService = CounterService();
+    await Future.delayed(Duration(milliseconds: 50));
     expect(counterService.value, 0);
   });
 
   test('Inicializa o contador com valor salvo em SharedPreferences', () async {
     // Define um valor inicial no SharedPreferences simulado
     SharedPreferences.setMockInitialValues({CounterService.keyCounter: 5});
-
-    // Inicializa o serviço e verifica o valor
     counterService = CounterService();
+    await Future.delayed(Duration(milliseconds: 50));
     expect(counterService.value, 5);
   });
 
   test('Incrementa o contador e salva em SharedPreferences', () async {
-    await counterService.increment(); // Incrementa o contador
+    // Incrementa o contador
+    await counterService.increment();
 
     // Verifica se o valor incrementado é 1
     expect(counterService.value, 1);

@@ -6,11 +6,11 @@ class CounterService extends ChangeNotifier {
   int _value = 0;
   int get value => _value;
 
-  CounterService() {
-    _init();
+  CounterService({SharedPreferences? prefs}) {
+    _init(prefs);
   }
 
-  Future<void> _init() async {
+  Future<void> _init(SharedPreferences? prefs) async {
     final prefs = await SharedPreferences.getInstance();
     _value = prefs.getInt(keyCounter) ?? 0;
     notifyListeners();
