@@ -26,11 +26,13 @@ samples, guidance on mobile development, and a full API reference.
 - [image_picker](https://pub.dev/packages/image_picker)
 - [google_fonts](https://pub.dev/packages/google_fonts)
 - [provider](https://pub.dev/packages/provider)
+- [get_it](https://pub.dev/packages/get_it)
 - [intl](https://pub.dev/packages/intl)
 - [uuid](https://pub.dev/packages/uuid)
 - [hive](https://pub.dev/packages/hive)
 - [http](https://pub.dev/packages/http)
 - [gal](https://pub.dev/packages/gal)
+- [get](https://pub.dev/packages/get)
 
 ## Command-line
 [docs:flutter-cli](https://docs.flutter.dev/reference/flutter-cli)

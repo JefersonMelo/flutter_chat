@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../widgets/AppBars/appbar_wd.dart';
-import '../app.dart';
 import '../utils/enums_utils.dart';
+import '../../widgets/AppBars/appbar_wd.dart';
+import '../configs/user_prefs_config.dart';
 
 class SharedPreferencesPage extends StatefulWidget {
   const SharedPreferencesPage({super.key});
@@ -84,27 +84,29 @@ class _SharedPreferencesPageState extends State<SharedPreferencesPage> {
                   isPushNotification = value;
                 });
               }),
-          Consumer<ThemeProvider>(
-            builder: (context, themeProvider, child) {
-              return SwitchListTile(
-                title: Text('Tema Escuro'),
-                value: themeProvider.isDarkMode,
-                onChanged: (value) {
-                  themeProvider.toggleTheme();
-                },
+          Consumer<UserPrefsConfig>(
+            builder: (context, userPrefs, child) {
+              return Column(
+                children: [
+                  SwitchListTile(
+                    title: Text('Tema Escuro'),
+                    value: userPrefs.isDarkMode,
+                    onChanged: (value) {
+                      userPrefs.toggleTheme(value);
+                    },
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      onButtonTapped(context);
+                      userPrefs.getUserValues();
+                    },
+                    child: const Text('Salvar'),
+                  )
+                ],
               );
             },
           ),
-          TextButton(
-            onPressed: () {
-              FocusManager.instance.primaryFocus?.unfocus();
-              onButtonTapped(context);
-              setState(() {
-                App.restartApp(context);
-              });
-            },
-            child: const Text('Salvar'),
-          )
         ],
       ),
     ));

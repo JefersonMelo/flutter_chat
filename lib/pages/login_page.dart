@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../configs/logged_config.dart';
 import '../shared/app_images.dart';
-import '../utils/enums_utils.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -21,7 +21,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: const Color.fromARGB(255, 229, 227, 227),
       body: SizedBox(
         width: double.infinity,
         child: SafeArea(
@@ -47,21 +46,18 @@ class _LoginPageState extends State<LoginPage> {
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 5),
                 width: double.infinity,
-                // height: 30,
                 child: TextField(
                   controller: emailControl,
                   onChanged: (value) {},
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.email),
                     hintText: "Email",
-                    // hintStyle: TextStyle(color: Colors.grey),
                   ),
                 ),
               ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 23, vertical: 5),
                 width: double.infinity,
-                // height: 30,
                 child: TextField(
                   obscureText: isObscureText,
                   controller: senhaControl,
@@ -89,17 +85,13 @@ class _LoginPageState extends State<LoginPage> {
                   child: TextButton(
                     onPressed: () async {
                       if (emailControl.text.trim().isEmpty || senhaControl.text.trim().isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text("deu ruim ao tentar se conectar"),
-                          backgroundColor: Colors.redAccent,
-                        ));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("deu ruim ao tentar se conectar"), backgroundColor: Colors.redAccent));
                       } else {
-                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage(title: 'Contador Page')));
-                        storage = await SharedPreferences.getInstance();
-                        await storage.setBool(EnumsPreferencesUtils.keyLoggedIn.name, true);
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage(title: 'Home Page')));
+                        LoggedConfig().isLoggedIn = true;
                       }
                     },
-                    // style: const ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.grey)),
                     child: const Text("Entrar", style: TextStyle(fontWeight: FontWeight.w900)),
                   ),
                 ),
@@ -110,20 +102,14 @@ class _LoginPageState extends State<LoginPage> {
                 width: double.infinity,
                 height: 30,
                 alignment: Alignment.center,
-                child: const Text(
-                  "Conceder Novo Acesso ",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                child: const Text("Conceder Novo Acesso ", style: TextStyle(fontWeight: FontWeight.bold)),
               ),
               Container(
                 margin: const EdgeInsets.all(7),
                 width: double.infinity,
                 height: 30,
                 alignment: Alignment.center,
-                child: const Text(
-                  "Esqueci Minha Senha",
-                  style: TextStyle(fontWeight: FontWeight.w900),
-                ),
+                child: const Text("Esqueci Minha Senha", style: TextStyle(fontWeight: FontWeight.w900)),
               ),
               Expanded(flex: 1, child: Container()),
             ],

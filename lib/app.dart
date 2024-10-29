@@ -3,21 +3,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../pages/splash_screem_page.dart';
+import 'configs/user_prefs_config.dart';
+import 'configs/logged_config.dart';
 import 'pages/home_page.dart';
-import 'pages/splash_screem_page.dart';
+import 'services/counter_service.dart';
 import 'utils/enums_utils.dart';
 import 'configs/custom_theme_config.dart';
-
-class ThemeProvider extends ChangeNotifier {
-  bool _isDarkMode = false;
-  bool get isDarkMode => _isDarkMode;
-  void toggleTheme() async {
-    _isDarkMode = !_isDarkMode;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(EnumsPreferencesUtils.keyDarkMode.name, _isDarkMode);
-    notifyListeners();
-  }
-}
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -32,11 +24,12 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> with WidgetsBindingObserver {
   Key key = UniqueKey();
+  String appStatus = '';
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    loadingSharedPreferences();
   }
 
   @override
@@ -45,62 +38,51 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  Future<void> _removeLoginStatus() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove(EnumsPreferencesUtils.keyLoggedIn.name);
-  }
-
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    appStatus = state.toString().split('.')[1];
     if (state == AppLifecycleState.paused) {
       _removeLoginStatus();
     }
+  }
+
+  Future<void> _removeLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove(EnumsPreferencesUtils.keyLoggedIn.name);
   }
 
   void restartApp() {
     setState(() => key = UniqueKey());
   }
 
-  Future<SharedPreferences> loadingSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs;
-  }
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext bc) {
     Intl.defaultLocale = 'pt_BR';
     CustomThemeConfig custonTheme = CustomThemeConfig();
-    return FutureBuilder<SharedPreferences>(
-      future: SharedPreferences.getInstance(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final prefs = snapshot.data;
-          final isDarkMode = prefs!.getBool(EnumsPreferencesUtils.keyDarkMode.name) ?? false;
-          final isLoggedIn = prefs.getBool(EnumsPreferencesUtils.keyLoggedIn.name) ?? false;
-          debugPrint(isLoggedIn.toString());
-          return ChangeNotifierProvider(
-            create: (context) => ThemeProvider().._isDarkMode = isDarkMode,
-            child: KeyedSubtree(
-              key: key,
-              child: MaterialApp(
-                title: 'Flutter Template',
-                debugShowCheckedModeBanner: false,
-                locale: const Locale('pt'),
-                theme: isDarkMode ? custonTheme.darkTheme : custonTheme.lightTheme,
-                localizationsDelegates: const [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [Locale('pt', 'BR'), Locale('en', 'UK')],
-                home: isLoggedIn ? HomePage(title: 'Contador Page') : SplashScreemPage(),
-              ),
-            ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<LoggedConfig>(create: (_) => LoggedConfig()),
+        ChangeNotifierProvider<CounterService>(create: (_) => CounterService()),
+        ChangeNotifierProvider<UserPrefsConfig>(create: (_) => UserPrefsConfig()),
+      ],
+      child: Consumer<UserPrefsConfig>(
+        builder: (context, userPreferences, widget) {
+          final statusLoggedIn = context.watch<LoggedConfig>();
+          return MaterialApp(
+            title: 'Flutter Template',
+            debugShowCheckedModeBanner: false,
+            locale: const Locale('pt'),
+            theme: userPreferences.isDarkMode ? custonTheme.darkTheme : custonTheme.lightTheme,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('pt', 'BR'), Locale('en', 'UK')],
+            home: statusLoggedIn.isLoggedIn ? HomePage(title: 'Contador Page') : SplashScreemPage(),
           );
-        } else {
-          return CircularProgressIndicator();
-        }
-      },
+        },
+      ),
     );
   }
 }
